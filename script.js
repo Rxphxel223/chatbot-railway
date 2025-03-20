@@ -34,3 +34,32 @@ function sendMessage() {
 
     document.getElementById("user-input").value = "";
 }
+
+function login() {
+    let password = prompt("Bitte gib dein Passwort ein:");
+    fetch("https://chatbot-api-xw3r.onrender.com/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",  // WICHTIG: Damit die Session gespeichert wird!
+        body: JSON.stringify({ password: password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert("Login erfolgreich!");
+        } else {
+            alert("Falsches Passwort!");
+        }
+    });
+}
+
+function logout() {
+    fetch("https://chatbot-api-xw3r.onrender.com/logout", {
+        method: "POST",
+        credentials: "include"
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Du bist jetzt ausgeloggt.");
+    });
+}
