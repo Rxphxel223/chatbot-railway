@@ -2,15 +2,17 @@ import openai
 import os
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
-from flask_session import Session  
+from flask_session import Session
+import tempfile  # Wichtig für stabilen Speicherort
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default-secret")
 
-# 🛠 FIX: Flask-Session in Render richtig speichern
+# 🛠 FIX: Persistente Flask-Sessions
+SESSION_DIR = tempfile.mkdtemp()  # Stellt sicher, dass die Session stabil gespeichert bleibt
+app.config["SESSION_FILE_DIR"] = SESSION_DIR
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_FILE_DIR"] = "/tmp/flask_session"  # Render-kompatibel
 Session(app)
 
 CORS(app, supports_credentials=True)
@@ -27,7 +29,7 @@ def login():
     data = request.json
     if data.get("password") == LOGIN_PASSWORD:
         session["logged_in"] = True
-        session.modified = True  # 🛠 FIX: Session-Änderung speichern
+        session.modified = True  # Speichert die Session sofort
         return jsonify({"message": "Erfolgreich eingeloggt"}), 200
     return jsonify({"error": "Falsches Passwort"}), 403
 
