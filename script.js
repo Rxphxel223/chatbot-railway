@@ -57,7 +57,7 @@ function sendMessage() {
     fetch("https://chatbot-api-xw3r.onrender.com/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",  // WICHTIG: Cookies mit senden
+        credentials: "include",  // WICHTIG: Sendet Cookies mit!
         body: JSON.stringify({ question: userInput })
     })
     .then(response => response.json())
