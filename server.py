@@ -9,10 +9,6 @@ CORS(app, origins=["https://raphaelgafurow.de"])
 # OpenAI API-Key laden
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-@app.route('/')
-def home():
-    return "API läuft!", 200  # Fügt eine Startseite hinzu, um zu prüfen, ob Flask läuft
-
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.json
@@ -27,7 +23,7 @@ def ask():
             messages=[{"role": "system", "content": "Du bist ein Assistent, der Fragen über Raphael beantwortet."},
                       {"role": "user", "content": question}]
         )
-        answer = response["choices"][0]["message"]["content"]
+        answer = response.choices[0].message.content  # Neue Methode für Zugriff auf die Antwort
         return jsonify({"answer": answer})
 
     except Exception as e:
