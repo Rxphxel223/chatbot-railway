@@ -18,7 +18,7 @@ function sendMessage() {
     userMessage.textContent = userInput;
     chatBox.appendChild(userMessage);
 
-    fetch('https://mein-api.up.railway.app/ask', {  // ⚠ HIER deine Railway-URL einfügen
+    fetch('https://chatbot-api-xw3r.onrender.com', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: userInput })
