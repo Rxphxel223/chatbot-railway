@@ -2,26 +2,27 @@ import openai
 import os
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
+from flask_session import Session  # Import für persistente Sessions
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "default-secret")  # Lädt SECRET_KEY aus Render
+app.secret_key = os.getenv("SECRET_KEY", "default-secret")
+
+# Session richtig konfigurieren
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"  # Speichert die Session auf dem Server
+Session(app)
+
 CORS(app, supports_credentials=True)
 
-# OpenAI API-Schlüssel aus Umgebungsvariablen laden
 openai.api_key = os.getenv("OPENAI_API_KEY")
-
-# Passwort für den Login aus Umgebungsvariablen
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
-
-@app.route('/')
-def home():
-    return "API läuft!", 200  # Hilft zu testen, ob das Backend läuft
 
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
     if data.get("password") == LOGIN_PASSWORD:
         session["logged_in"] = True
+        session.modified = True  # Speichert die Session sofort
         return jsonify({"message": "Erfolgreich eingeloggt"}), 200
     return jsonify({"error": "Falsches Passwort"}), 403
 
@@ -49,7 +50,7 @@ def ask():
                 {"role": "user", "content": question}
             ]
         )
-        answer = response.choices[0].message.content  # ✅ Korrekte Syntax für OpenAI 0.28
+        answer = response.choices[0].message.content  
         return jsonify({"answer": answer})
 
     except Exception as e:
