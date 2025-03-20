@@ -3,35 +3,33 @@ const maxQuestions = 10;
 
 function sendMessage() {
     let userInput = document.getElementById("user-input").value;
-    if (!userInput.trim()) return;
+    if (!userInput.trim()) return;  // Falls kein Text eingegeben wurde, nichts senden
 
-    if (questionCount >= maxQuestions) {
-        alert("Du hast das Frage-Limit von 10 erreicht.");
-        return;
-    }
-
-    questionCount++;
-
+    // Nutzer-Eingabe anzeigen
     let chatBox = document.getElementById("chat-box");
-    let userMessage = document.createElement("div");
-    userMessage.className = "user-message";
-    userMessage.textContent = userInput;
-    chatBox.appendChild(userMessage);
+    chatBox.innerHTML += `<div><strong>Du:</strong> ${userInput}</div>`;
 
-    fetch('https://chatbot-api-xw3r.onrender.com/ask', {  // ⚠ HIER deine Railway-URL einfügen
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+    // Anfrage an die API senden
+    fetch("https://chatbot-api-xw3r.onrender.com/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",  // Wichtig: Sendet die Session-Cookies mit!
         body: JSON.stringify({ question: userInput })
     })
     .then(response => response.json())
     .then(data => {
-        let botMessage = document.createElement("div");
-        botMessage.className = "bot-message";
-        botMessage.textContent = data.answer;
-        chatBox.appendChild(botMessage);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        if (data.answer) {
+            chatBox.innerHTML += `<div><strong>Chatbot:</strong> ${data.answer}</div>`;
+        } else {
+            chatBox.innerHTML += `<div><strong>Fehler:</strong> ${data.error}</div>`;
+        }
+    })
+    .catch(error => {
+        chatBox.innerHTML += `<div><strong>Fehler:</strong> Anfrage fehlgeschlagen.</div>`;
+        console.error("Fehler:", error);
     });
 
+    // Eingabefeld leeren
     document.getElementById("user-input").value = "";
 }
 
