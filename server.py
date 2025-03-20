@@ -13,6 +13,10 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # Passwort für den Login aus Umgebungsvariablen
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
 
+@app.route('/')
+def home():
+    return "API läuft!", 200  # Hilft zu testen, ob das Backend läuft
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -45,7 +49,7 @@ def ask():
                 {"role": "user", "content": question}
             ]
         )
-        answer = response.choices[0].message.content  # ✅ Korrekte Syntax für OpenAI v1.0+
+        answer = response.choices[0].message.content  # ✅ Korrekte Syntax für OpenAI 0.28
         return jsonify({"answer": answer})
 
     except Exception as e:
