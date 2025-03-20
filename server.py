@@ -1,20 +1,36 @@
 import openai
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app, origins=["https://raphaelgafurow.de"])
+app.secret_key = os.getenv("SECRET_KEY", "default-secret")  # Lädt SECRET_KEY aus Render
+CORS(app, supports_credentials=True)
 
 # OpenAI API-Schlüssel aus Umgebungsvariablen laden
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-@app.route('/')
-def home():
-    return "API läuft!", 200  # Startseite für Tests
+# Passwort für den Login aus Umgebungsvariablen
+LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    if data.get("password") == LOGIN_PASSWORD:
+        session["logged_in"] = True
+        return jsonify({"message": "Erfolgreich eingeloggt"}), 200
+    return jsonify({"error": "Falsches Passwort"}), 403
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({"message": "Erfolgreich ausgeloggt"}), 200
 
 @app.route('/ask', methods=['POST'])
 def ask():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Nicht eingeloggt"}), 403
+
     data = request.json
     question = data.get("question")
 
@@ -29,7 +45,7 @@ def ask():
                 {"role": "user", "content": question}
             ]
         )
-        answer = response.choices[0].message.content  # ✅ Richtige Syntax für OpenAI v1.0+
+        answer = response["choices"][0]["message"]["content"]
         return jsonify({"answer": answer})
 
     except Exception as e:
