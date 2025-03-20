@@ -29,7 +29,7 @@ def ask():
                 {"role": "user", "content": question}
             ]
         )
-        answer = response["choices"][0]["message"]["content"]  # ✅ Richtig für OpenAI v1.0+
+        answer = response.choices[0].message.content  # ✅ Richtige Syntax für OpenAI v1.0+
         return jsonify({"answer": answer})
 
     except Exception as e:
