@@ -3,19 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raphael Chat</title>
+    <title>Chatbot Login</title>
+    <script src="script.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <button onclick="login()">Login</button>
-<button onclick="logout()">Logout</button>
-    <div class="chat-container">
-        <div id="chat-box"></div>
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Stelle eine Frage über Raphael..." />
-            <button onclick="sendMessage()">Senden</button>
+<body onload="checkLogin()">
+    <!-- Login-Fenster -->
+    <div id="login-screen">
+        <h2>Passwortgeschützt</h2>
+        <input type="password" id="password" placeholder="Passwort eingeben">
+        <button onclick="checkPassword()">Login</button>
+    </div>
+
+    <!-- Chat-Fenster (versteckt bis Login erfolgreich ist) -->
+    <div id="main-content" style="display:none;">
+        <h2>Chatbot</h2>
+        <button onclick="logout()">Logout</button>
+        <div class="chat-container">
+            <div id="chat-box"></div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Stelle eine Frage über Raphael...">
+                <button onclick="sendMessage()">Senden</button>
+            </div>
         </div>
     </div>
-    <script src="script.js"></script>
 </body>
 </html>
