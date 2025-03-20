@@ -7,10 +7,10 @@ from flask_session import Session
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default-secret")
 
-# Sitzungskonfiguration verbessern
+# 🛠 FIX: Flask-Session in Render richtig speichern
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_FILE_DIR"] = "/tmp/flask_session"  # Speicherort auf Render
+app.config["SESSION_FILE_DIR"] = "/tmp/flask_session"  # Render-kompatibel
 Session(app)
 
 CORS(app, supports_credentials=True)
@@ -27,7 +27,7 @@ def login():
     data = request.json
     if data.get("password") == LOGIN_PASSWORD:
         session["logged_in"] = True
-        session.modified = True
+        session.modified = True  # 🛠 FIX: Session-Änderung speichern
         return jsonify({"message": "Erfolgreich eingeloggt"}), 200
     return jsonify({"error": "Falsches Passwort"}), 403
 
