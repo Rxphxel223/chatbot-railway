@@ -40,7 +40,7 @@ function login() {
     fetch("https://chatbot-api-xw3r.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",  // WICHTIG: Damit die Session gespeichert wird!
+        credentials: "include",  // WICHTIG: Session speichern
         body: JSON.stringify({ password: password })
     })
     .then(response => response.json())
