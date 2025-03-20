@@ -12,20 +12,25 @@
     <div id="login-screen">
         <h2>Passwortgeschützt</h2>
         <input type="password" id="password" placeholder="Passwort eingeben">
+        <label>
+            <input type="checkbox" id="remember-me"> Eingeloggt bleiben
+        </label>
         <button onclick="checkPassword()">Login</button>
     </div>
 
-    <!-- Chat-Fenster (versteckt bis Login erfolgreich ist) -->
+    <!-- Chat-Fenster (wird erst nach Login angezeigt) -->
     <div id="main-content" style="display:none;">
         <h2>Chatbot</h2>
         <button onclick="logout()">Logout</button>
         <div class="chat-container">
             <div id="chat-box"></div>
             <div class="input-area">
-                <input type="text" id="user-input" placeholder="Stelle eine Frage über Raphael...">
+                <input type="text" id="user-input" placeholder="Stelle eine Frage über Raphael..." onkeydown="handleKeyPress(event)">
                 <button onclick="sendMessage()">Senden</button>
             </div>
         </div>
     </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
