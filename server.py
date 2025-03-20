@@ -3,16 +3,19 @@ import os
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_session import Session
-import tempfile  # Wichtig für stabilen Speicherort
+import tempfile  # WICHTIG: Sicherstellen, dass Flask die Session speichert!
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default-secret")
 
-# 🛠 FIX: Persistente Flask-Sessions
-SESSION_DIR = tempfile.mkdtemp()  # Stellt sicher, dass die Session stabil gespeichert bleibt
+# 🛠 FIX: Stabile Session-Speicherung auf Render
+SESSION_DIR = tempfile.mkdtemp()  # Temporäres Verzeichnis für Sessions
 app.config["SESSION_FILE_DIR"] = SESSION_DIR
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_COOKIE_HTTPONLY"] = False  # WICHTIG: Muss für JavaScript deaktiviert sein!
+app.config["SESSION_COOKIE_SAMESITE"] = "None"  # WICHTIG für CORS-Cookies!
+app.config["SESSION_COOKIE_SECURE"] = True  # Muss auf True sein, wenn HTTPS genutzt wird
 Session(app)
 
 CORS(app, supports_credentials=True)
@@ -29,7 +32,7 @@ def login():
     data = request.json
     if data.get("password") == LOGIN_PASSWORD:
         session["logged_in"] = True
-        session.modified = True  # Speichert die Session sofort
+        session.modified = True  # 🛠 FIX: Session wird direkt gespeichert
         return jsonify({"message": "Erfolgreich eingeloggt"}), 200
     return jsonify({"error": "Falsches Passwort"}), 403
 
@@ -41,6 +44,8 @@ def logout():
 @app.route('/ask', methods=['POST'])
 def ask():
     print("🔍 /ask wurde aufgerufen")
+    print("📂 Session Inhalt:", session)
+
     if not session.get("logged_in"):
         print("❌ Nicht eingeloggt")
         return jsonify({"error": "Nicht eingeloggt"}), 403
