@@ -28,7 +28,7 @@ function checkPassword() {
     fetch("https://chatbot-api-xw3r.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",  // WICHTIG: Cookies mit senden
+        credentials: "include",  // WICHTIG: Sendet Session-Cookie mit!
         body: JSON.stringify({ password: password })
     })
     .then(response => response.json())
@@ -37,13 +37,17 @@ function checkPassword() {
             alert("Login erfolgreich!");
             document.getElementById("login-screen").style.display = "none";
             document.getElementById("main-content").style.display = "block";
-            
+
+            // Lokalen Speicher für "Eingeloggt bleiben" setzen
             if (rememberMe) {
                 localStorage.setItem("rememberMe", "true");
             }
         } else {
             alert("Falsches Passwort!");
         }
+    })
+    .catch(error => {
+        console.error("Login-Fehler:", error);
     });
 }
 
