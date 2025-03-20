@@ -27,9 +27,9 @@ function checkPassword() {
 
     fetch("https://chatbot-api-xw3r.onrender.com/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" }, // WICHTIG: JSON-Format setzen!
-        credentials: "include",  
-        body: JSON.stringify({ password: password }) // WICHTIG: JSON.stringify nutzen!
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",  // 🛠 FIX: Sende Session-Cookies mit!
+        body: JSON.stringify({ password: password })
     })
     .then(response => response.json())
     .then(data => {
@@ -60,17 +60,15 @@ function sendMessage() {
     fetch("https://chatbot-api-xw3r.onrender.com/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",  // WICHTIG: Sendet Session-Cookie mit!
+        credentials: "include",  // 🛠 FIX: Sendet Session-Cookie mit!
         body: JSON.stringify({ question: userInput })
     })
     .then(response => response.json())
     .then(data => {
-        if (data && data.answer) {
+        if (data.answer) {
             chatBox.innerHTML += `<div><strong>Chatbot:</strong> ${data.answer}</div>`;
-        } else if (data && data.error) {
-            chatBox.innerHTML += `<div><strong>Fehler:</strong> ${data.error}</div>`;
         } else {
-            chatBox.innerHTML += `<div><strong>Fehler:</strong> Unerwartete Antwort vom Server.</div>`;
+            chatBox.innerHTML += `<div><strong>Fehler:</strong> ${data.error}</div>`;
         }
     })
     .catch(error => {
