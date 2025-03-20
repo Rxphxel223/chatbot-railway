@@ -21,16 +21,14 @@ function checkLogin() {
         });
     }
 }
-
-// Überprüft das eingegebene Passwort und speichert Login-Status
 function checkPassword() {
     let password = document.getElementById("password").value;
-    let rememberMe = document.getElementById("remember-me").checked; // Prüft, ob Checkbox aktiviert ist
+    let rememberMe = document.getElementById("remember-me").checked;
 
     fetch("https://chatbot-api-xw3r.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        credentials: "include",  // WICHTIG: Cookies mit senden
         body: JSON.stringify({ password: password })
     })
     .then(response => response.json())
@@ -39,9 +37,9 @@ function checkPassword() {
             alert("Login erfolgreich!");
             document.getElementById("login-screen").style.display = "none";
             document.getElementById("main-content").style.display = "block";
-
+            
             if (rememberMe) {
-                localStorage.setItem("rememberMe", "true"); // Speichert den Login-Status
+                localStorage.setItem("rememberMe", "true");
             }
         } else {
             alert("Falsches Passwort!");
@@ -49,35 +47,17 @@ function checkPassword() {
     });
 }
 
-// Meldet den Nutzer ab und löscht gespeicherte Daten
-function logout() {
-    fetch("https://chatbot-api-xw3r.onrender.com/logout", {
-        method: "POST",
-        credentials: "include"
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert("Du bist jetzt ausgeloggt.");
-        document.getElementById("login-screen").style.display = "block";
-        document.getElementById("main-content").style.display = "none";
-        localStorage.removeItem("rememberMe"); // Entfernt den gespeicherten Login-Status
-    });
-}
-
-// Nachricht senden (per Button oder Enter)
 function sendMessage() {
     let userInput = document.getElementById("user-input").value;
-    if (!userInput.trim()) return;  // Falls kein Text eingegeben wurde, nichts senden
+    if (!userInput.trim()) return;
 
-    // Nutzer-Eingabe anzeigen
     let chatBox = document.getElementById("chat-box");
     chatBox.innerHTML += `<div><strong>Du:</strong> ${userInput}</div>`;
 
-    // Anfrage an die API senden
     fetch("https://chatbot-api-xw3r.onrender.com/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",  // Wichtig: Sendet die Session-Cookies mit!
+        credentials: "include",  // WICHTIG: Cookies mit senden
         body: JSON.stringify({ question: userInput })
     })
     .then(response => response.json())
@@ -93,8 +73,21 @@ function sendMessage() {
         console.error("Fehler:", error);
     });
 
-    // Eingabefeld leeren
     document.getElementById("user-input").value = "";
+}
+// Meldet den Nutzer ab und löscht gespeicherte Daten
+function logout() {
+    fetch("https://chatbot-api-xw3r.onrender.com/logout", {
+        method: "POST",
+        credentials: "include"
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Du bist jetzt ausgeloggt.");
+        document.getElementById("login-screen").style.display = "block";
+        document.getElementById("main-content").style.display = "none";
+        localStorage.removeItem("rememberMe"); // Entfernt den gespeicherten Login-Status
+    });
 }
 
 // Prüft, ob Enter gedrückt wurde und sendet die Nachricht
