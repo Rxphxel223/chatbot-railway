@@ -1,5 +1,6 @@
 import openai
 import os
+import pandas as pd
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_session import Session
