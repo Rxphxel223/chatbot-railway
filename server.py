@@ -24,9 +24,12 @@ CORS(app, supports_credentials=True)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
 
-# 📌 1️⃣ Fragenkatalog laden (als Kontext für OpenAI)
-file_path = "/mnt/data/fragenkatalog.xlsx"
-df = pd.read_excel(file_path)
+# 📌 1️⃣ Fragenkatalog laden (richtiger Pfad für Render!)
+file_path = "/etc/secrets/fragenkatalog.xlsx"  # 🔥 Neuer Pfad für Render Secret Files!
+if os.path.exists(file_path):
+    df = pd.read_excel(file_path)
+else:
+    df = pd.DataFrame(columns=["Frage", "Antwort"])  # Falls Datei fehlt, erstelle eine leere Datenbank
 
 # 🔥 2️⃣ Erstelle eine Zusammenfassung deines Wissens aus der Datei
 def generate_personal_context():
@@ -35,7 +38,6 @@ def generate_personal_context():
         context += f"- {row['Frage']}: {row['Antwort']}\n"
     context += "\nAntworte immer so, als wärst du ein guter Freund von Raphael."
     return context
-
 
 @app.route('/')
 def home():
@@ -72,6 +74,10 @@ def ask():
         return jsonify({"error": "Keine Frage gestellt"}), 400
 
     question = data.get("question")
+
+    # 📌 Erzeuge den personalisierten Kontext
+    personal_context = generate_personal_context()
+
     try:
         openai_response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
@@ -80,7 +86,7 @@ def ask():
                 {"role": "user", "content": question}
             ]
         )
-        answer = response.choices[0].message.content  
+        answer = openai_response.choices[0].message.content  
         print("✅ OpenAI Antwort:", answer)  
 
         return jsonify({"answer": answer})
