@@ -23,7 +23,6 @@ CORS(app, supports_credentials=True)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
 
-# ❗ Hier deinen echten Modellnamen eintragen
 FINE_TUNED_MODEL = "ft:gpt-3.5-turbo-1106:raphael::BDTAb8wD"
 
 @app.route('/')
