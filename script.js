@@ -1,7 +1,7 @@
 let questionCount = 0;
 const maxQuestions = 10;
 
-// Prüft, ob der Nutzer eingeloggt ist (lokale Speicherung beachten)
+
 function checkLogin() {
     let remembered = localStorage.getItem("rememberMe");
     if (remembered === "true") {
@@ -28,7 +28,7 @@ function checkPassword() {
     fetch("https://chatbot-api-xw3r.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",  // 🛠 FIX: Sende Session-Cookies mit!
+        credentials: "include",  
         body: JSON.stringify({ password: password })
     })
     .then(response => response.json())
@@ -60,7 +60,7 @@ function sendMessage() {
     fetch("https://chatbot-api-xw3r.onrender.com/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",  // 🛠 FIX: Sendet Session-Cookie mit!
+        credentials: "include", 
         body: JSON.stringify({ question: userInput })
     })
     .then(response => response.json())
@@ -78,7 +78,7 @@ function sendMessage() {
 
     document.getElementById("user-input").value = "";
 }
-// Meldet den Nutzer ab und löscht gespeicherte Daten
+
 function logout() {
     fetch("https://chatbot-api-xw3r.onrender.com/logout", {
         method: "POST",
@@ -93,7 +93,7 @@ function logout() {
     });
 }
 
-// Prüft, ob Enter gedrückt wurde und sendet die Nachricht
+
 function handleKeyPress(event) {
     if (event.key === "Enter") {
         sendMessage();
