@@ -3,5 +3,4 @@ gunicorn
 flask-cors
 openai==0.28
 flask-session
-pandas
-openpyxl
+
