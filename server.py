@@ -1,4 +1,5 @@
 import openai
+import openpyxl
 import os
 import pandas as pd
 from flask import Flask, request, jsonify, session
@@ -25,11 +26,11 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
 
 # 📌 1️⃣ Fragenkatalog laden (richtiger Pfad für Render!)
-file_path = "/etc/secrets/fragenkatalog.xlsx"  # 🔥 Neuer Pfad für Render Secret Files!
+file_path = "/etc/secrets/fragenkatalog.xlsx"  # Render Secret File Pfad
 if os.path.exists(file_path):
-    df = pd.read_excel(file_path)
+    df = pd.read_excel(file_path, engine="openpyxl")  # 🔥 Engine explizit setzen!
 else:
-    df = pd.DataFrame(columns=["Frage", "Antwort"])  # Falls Datei fehlt, erstelle eine leere Datenbank
+    df = pd.DataFrame(columns=["Frage", "Antwort"])  # Falls Datei fehlt, leere Tabelle
 
 # 🔥 2️⃣ Erstelle eine Zusammenfassung deines Wissens aus der Datei
 def generate_personal_context():
