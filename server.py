@@ -1,23 +1,21 @@
 import openai
-import openpyxl
 import os
-import pandas as pd
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_session import Session
-import tempfile  # WICHTIG: Sicherstellen, dass Flask die Session speichert!
+import tempfile
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default-secret")
 
-# 🛠 FIX: Stabile Session-Speicherung auf Render
-SESSION_DIR = tempfile.mkdtemp()  # Temporäres Verzeichnis für Sessions
+# ✅ Session für Render korrekt konfigurieren
+SESSION_DIR = tempfile.mkdtemp()
 app.config["SESSION_FILE_DIR"] = SESSION_DIR
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_COOKIE_HTTPONLY"] = False  # WICHTIG: Muss für JavaScript deaktiviert sein!
-app.config["SESSION_COOKIE_SAMESITE"] = "None"  # WICHTIG für CORS-Cookies!
-app.config["SESSION_COOKIE_SECURE"] = True  # Muss auf True sein, wenn HTTPS genutzt wird
+app.config["SESSION_COOKIE_HTTPONLY"] = False
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_SECURE"] = True
 Session(app)
 
 CORS(app, supports_credentials=True)
@@ -25,25 +23,8 @@ CORS(app, supports_credentials=True)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
 
-# 📌 1️⃣ Fragenkatalog laden (richtiger Pfad für Render!)
-file_path = "/etc/secrets/fragenkatalog.xlsx"  # 🔥 Neuer Pfad für Render Secret Files!
-if os.path.exists(file_path):
-    try:
-        df = pd.read_excel(file_path, engine="openpyxl")  # Engine explizit setzen!
-    except Exception as e:
-        print(f"⚠️ Fehler beim Laden der Datei: {e}")
-        df = pd.DataFrame(columns=["Frage", "Antwort"])  # Falls Datei ungültig ist
-else:
-    print("⚠️ Datei nicht gefunden, starte mit leerer Datenbank.")
-    df = pd.DataFrame(columns=["Frage", "Antwort"])  # Falls Datei fehlt, leere Tabelle
-
-# 🔥 2️⃣ Erstelle eine Zusammenfassung deines Wissens aus der Datei
-def generate_personal_context():
-    context = "Hier sind einige Fakten über Raphael Gafurow:\n"
-    for _, row in df.iterrows():
-        context += f"- {row['Frage']}: {row['Antwort']}\n"
-    context += "\nAntworte immer so, als wärst du ein guter Freund von Raphael."
-    return context
+# ❗ Hier deinen echten Modellnamen eintragen
+FINE_TUNED_MODEL = "ft:gpt-3.5-turbo-1106:raphael::BDTAb8wD"
 
 @app.route('/')
 def home():
@@ -54,7 +35,7 @@ def login():
     data = request.json
     if data.get("password") == LOGIN_PASSWORD:
         session["logged_in"] = True
-        session.modified = True  # 🛠 FIX: Session wird direkt gespeichert
+        session.modified = True
         return jsonify({"message": "Erfolgreich eingeloggt"}), 200
     return jsonify({"error": "Falsches Passwort"}), 403
 
@@ -73,32 +54,27 @@ def ask():
         return jsonify({"error": "Nicht eingeloggt"}), 403
 
     data = request.json
-    print("📩 Eingehende Anfrage:", data)  
+    print("📩 Eingehende Anfrage:", data)
 
     if not data or "question" not in data:
-        print("❌ Fehler: Keine Frage gesendet")
+        print("❌ Fehler: Keine Frage gestellt")
         return jsonify({"error": "Keine Frage gestellt"}), 400
 
     question = data.get("question")
 
-    # 📌 Erzeuge den personalisierten Kontext
-    personal_context = generate_personal_context()
-
     try:
         openai_response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model=FINE_TUNED_MODEL,
             messages=[
-                {"role": "system", "content": personal_context},  # Dein Wissen als Kontext
                 {"role": "user", "content": question}
             ]
         )
-        answer = openai_response.choices[0].message.content  
-        print("✅ OpenAI Antwort:", answer)  
-
+        answer = openai_response.choices[0].message.content
+        print("✅ Antwort vom Modell:", answer)
         return jsonify({"answer": answer})
 
     except Exception as e:
-        print("❌ OpenAI Fehler:", str(e))
+        print("❌ Fehler bei Anfrage an OpenAI:", str(e))
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
