@@ -55,7 +55,15 @@ function sendMessage() {
     if (!userInput.trim()) return;
 
     let chatBox = document.getElementById("chat-box");
-    chatBox.innerHTML += `<div><strong>Du:</strong> ${userInput}</div>`;
+
+
+    chatBox.innerHTML += `
+        <div class="user-message">${userInput}</div>
+    `;
+
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
 
     fetch("https://chatbot-api-xw3r.onrender.com/ask", {
         method: "POST",
@@ -66,13 +74,22 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         if (data.answer) {
-            chatBox.innerHTML += `<div><strong>Chatbot:</strong> ${data.answer}</div>`;
+            chatBox.innerHTML += `
+                <div class="bot-message">${data.answer}</div>
+            `;
         } else {
-            chatBox.innerHTML += `<div><strong>Fehler:</strong> ${data.error}</div>`;
+            chatBox.innerHTML += `
+                <div class="bot-message">❌ Fehler: ${data.error}</div>
+            `;
         }
+
+        
+        chatBox.scrollTop = chatBox.scrollHeight;
     })
     .catch(error => {
-        chatBox.innerHTML += `<div><strong>Fehler:</strong> Anfrage fehlgeschlagen.</div>`;
+        chatBox.innerHTML += `
+            <div class="bot-message">❌ Fehler: Anfrage fehlgeschlagen.</div>
+        `;
         console.error("Fehler:", error);
     });
 
