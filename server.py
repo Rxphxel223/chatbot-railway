@@ -23,6 +23,19 @@ CORS(app, supports_credentials=True)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
 
+# 📌 1️⃣ Fragenkatalog laden (als Kontext für OpenAI)
+file_path = "/mnt/data/fragenkatalog.xlsx"
+df = pd.read_excel(file_path)
+
+# 🔥 2️⃣ Erstelle eine Zusammenfassung deines Wissens aus der Datei
+def generate_personal_context():
+    context = "Hier sind einige Fakten über Raphael Gafurow:\n"
+    for _, row in df.iterrows():
+        context += f"- {row['Frage']}: {row['Antwort']}\n"
+    context += "\nAntworte immer so, als wärst du ein guter Freund von Raphael."
+    return context
+
+
 @app.route('/')
 def home():
     return "API läuft!", 200
@@ -59,11 +72,12 @@ def ask():
 
     question = data.get("question")
     try:
-        print("🎯 Anfrage an OpenAI wird gesendet...")
-        response = openai.ChatCompletion.create(
+        openai_response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[{"role": "system", "content": "Du bist ein Assistent, der Fragen über Raphael beantwortet."},
-                      {"role": "user", "content": question}]
+            messages=[
+                {"role": "system", "content": personal_context},  # Dein Wissen als Kontext
+                {"role": "user", "content": question}
+            ]
         )
         answer = response.choices[0].message.content  
         print("✅ OpenAI Antwort:", answer)  
