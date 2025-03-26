@@ -7,9 +7,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatBox = document.getElementById("chat-box");
     chatBox.innerHTML += `
         <div class="bot-message">
-            👋 Hey! Willkommen beim Raphael-Chatbot! Ich bin Raphaels bester Freund und beantworte dir gerne bis zu ${maxQuestions} Fragen über ihn. Am besten stellen sie die Frage so das der Name Raphael enthalten ist. Leg los!
+            👋 Willkommen! Ich bin Raphaels bester Freund und beantworte dir bis zu ${maxQuestions} Fragen über ihn. Leg los!
         </div>
     `;
+
+    // Enter-Taste aktiviert Login im Passwortfeld
+    document.getElementById("password").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            checkPassword();
+        }
+    });
 });
 
 function checkLogin() {
@@ -45,7 +52,6 @@ function checkPassword() {
     .then(response => response.json())
     .then(data => {
         if (data.message) {
-            alert("Login erfolgreich!");
             document.getElementById("login-screen").style.display = "none";
             document.getElementById("main-content").style.display = "block";
 
@@ -63,7 +69,6 @@ function checkPassword() {
 
 function sendMessage() {
     if (questionCount >= maxQuestions) {
-        alert("Du hast bereits das Limit von 10 Fragen erreicht.");
         return;
     }
 
@@ -87,14 +92,14 @@ function sendMessage() {
         } else {
             chatBox.innerHTML += `<div class="bot-message">❌ Fehler: ${data.error}</div>`;
         }
-        
+
         chatBox.scrollTop = chatBox.scrollHeight;
 
         questionCount += 1;
         if (questionCount >= maxQuestions) {
             chatBox.innerHTML += `
                 <div class="bot-message">
-                    🛑 Du hast das Limit von ${maxQuestions} Fragen erreicht. Sprich Raphael gerne direkt an, falls du noch weitere Fragen hast!
+                    🛑 Du hast das Limit von ${maxQuestions} Fragen erreicht. Sprich Raphael gerne direkt an, wenn du noch mehr wissen willst!
                 </div>
             `;
             document.getElementById("user-input").disabled = true;
@@ -115,8 +120,7 @@ function logout() {
         credentials: "include"
     })
     .then(response => response.json())
-    .then(data => {
-        alert("Du bist jetzt ausgeloggt.");
+    .then(() => {
         document.getElementById("login-screen").style.display = "block";
         document.getElementById("main-content").style.display = "none";
         localStorage.removeItem("rememberMe");
