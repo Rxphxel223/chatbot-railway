@@ -32,15 +32,15 @@ SYSTEM_MESSAGE = (
 )
 
 # Wissen aus Datei einlesen
-def load_context():
-    context = []
+WISSENSDATEI_PATH = "/etc/secrets/wissen.jsonl"
+def load_personal_context():
     try:
-        with open("/etc/secrets/wissen.jsonl", "r", encoding="utf-8") as f:
-            for line in f:
-                context.append(json.loads(line.strip()))
+        with open(WISSENSDATEI_PATH, "r", encoding="utf-8") as f:
+            messages = [json.loads(line)["messages"] for line in f if line.strip()]
+            return [msg for sublist in messages for msg in sublist]  # Flacht zu einer Liste ab
     except Exception as e:
-        print("⚠️ Kontext konnte nicht geladen werden:", e)
-    return context
+        print(f"⚠️ Kontext konnte nicht geladen werden: {e}")
+        return [{"role": "system", "content": "Ich bin ein persönlicher Assistent von Raphael Gafurow."}]
 
 @app.route('/')
 def home():
@@ -77,13 +77,27 @@ def ask():
         return jsonify({"error": "Keine Frage gestellt"}), 400
 
     question = data.get("question")
-    messages = [{"role": "system", "content": SYSTEM_MESSAGE}]
-    messages += load_context()
+
+    # System Message – definiert Ton und Rolle des Bots
+    messages = [{"role": "system", "content": "Du bist ein freundlicher, lockerer Assistent, der dem Benutzer Raphael Gafurow helfen soll. Sei direkt, höflich und sprich wie ein guter Kumpel von ihm."}]
+
+    # Wissen laden und als Kontext einfügen
+    try:
+        with open("/etc/secrets/wissen.jsonl", "r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip():
+                    item = json.loads(line)
+                    if "messages" in item:
+                        messages.extend(item["messages"])
+    except Exception as e:
+        print(f"⚠️ Kontext konnte nicht geladen werden: {e}")
+
+    # Nutzerfrage anhängen
     messages.append({"role": "user", "content": question})
 
     try:
         openai_response = openai.ChatCompletion.create(
-            model=MODEL,
+            model="gpt-3.5-turbo",
             messages=messages
         )
         answer = openai_response.choices[0].message.content
