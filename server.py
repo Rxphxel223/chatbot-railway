@@ -9,7 +9,7 @@ import tempfile
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default-secret")
 
-# Session-Konfiguration
+
 SESSION_DIR = tempfile.mkdtemp()
 app.config["SESSION_FILE_DIR"] = SESSION_DIR
 app.config["SESSION_PERMANENT"] = False
@@ -24,6 +24,12 @@ CORS(app, supports_credentials=True)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
 MODEL = "gpt-3.5-turbo"
+
+SYSTEM_MESSAGE = (
+    "Du bist ein freundlicher, vertrauenswürdiger Assistent und kennst Raphael Gafurow sehr gut. "
+    "Du sprichst mit anderen so, als wärst du sein bester Freund und beantwortest Fragen über ihn ehrlich, "
+    "klar und mit einem Hauch Humor, wenn passend. Falls du etwas nicht weißt, gib es offen zu."
+)
 
 # Wissen aus Datei einlesen
 def load_context():
@@ -71,7 +77,8 @@ def ask():
         return jsonify({"error": "Keine Frage gestellt"}), 400
 
     question = data.get("question")
-    messages = load_context()
+    messages = [{"role": "system", "content": SYSTEM_MESSAGE}]
+    messages += load_context()
     messages.append({"role": "user", "content": question})
 
     try:
