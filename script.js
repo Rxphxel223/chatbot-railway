@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatBox = document.getElementById("chat-box");
     chatBox.innerHTML += `
         <div class="bot-message">
-            👋 Hey! Willkommen beim Raphael-Chatbot! Ich bin Raphaels bester Freund und beantworte dir gerne bis zu ${maxQuestions} Fragen über ihn. Leg los!
+            👋 Hey! Willkommen beim Raphael-Chatbot! Ich bin Raphaels bester Freund und beantworte dir gerne bis zu ${maxQuestions} Fragen über ihn. Am besten stellen sie die Frage so das der Name Raphael enthalten ist. Leg los!
         </div>
     `;
 });
