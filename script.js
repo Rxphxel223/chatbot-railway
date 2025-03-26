@@ -7,7 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatBox = document.getElementById("chat-box");
     chatBox.innerHTML += `
         <div class="bot-message">
-            👋 Willkommen! Ich bin Raphaels bester Freund und beantworte dir bis zu ${maxQuestions} Fragen über ihn. Leg los!
+            👋 Willkommen! Ich bin hier, damit du Raphael besser kennenlernen kannst. 
+            Ich beantworte deine Fragen über Raphael aus der Sicht seines besten Freundes. 
+            Für die besten Ergebnisse formuliere deine Fragen bitte so, dass der Name „Raphael“ darin vorkommt. 
+            Du kannst mir bis zu ${maxQuestions} Fragen stellen – leg gerne los!
         </div>
     `;
 
