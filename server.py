@@ -4,6 +4,7 @@ import json
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_session import Session
+from datetime import datetime
 import tempfile
 
 app = Flask(__name__)
@@ -24,6 +25,7 @@ CORS(app, supports_credentials=True)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
 MODEL = "gpt-3.5-turbo"
+FRAGEN_LOG_DATEI = "/etc/secrets/fragen_log.txt"
 
 SYSTEM_MESSAGE = (
     "Du bist ein freundlicher, lockerer Assistent und der beste Freund von Raphael Gafurow. "
@@ -78,6 +80,12 @@ def ask():
         return jsonify({"error": "Keine Frage gestellt"}), 400
 
     question = data.get("question")
+
+    try:
+        with open(FRAGEN_LOG_DATEI, "a", encoding="utf-8") as log_file:
+            log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {question}\n")
+    except Exception as e:
+        print(f"⚠️ Fehler beim Loggen der Frage: {e}")
 
     # System Message – definiert Ton und Rolle des Bots
     messages = [{"role": "system", "content": SYSTEM_MESSAGE}]
