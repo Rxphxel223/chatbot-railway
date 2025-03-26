@@ -1,5 +1,6 @@
 import openai
 import os
+import json
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_session import Session
@@ -8,7 +9,7 @@ import tempfile
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default-secret")
 
-# ✅ Session für Render korrekt konfigurieren
+# Session-Konfiguration
 SESSION_DIR = tempfile.mkdtemp()
 app.config["SESSION_FILE_DIR"] = SESSION_DIR
 app.config["SESSION_PERMANENT"] = False
@@ -22,8 +23,18 @@ CORS(app, supports_credentials=True)
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
+MODEL = "gpt-3.5-turbo"
 
-FINE_TUNED_MODEL = "ft:gpt-3.5-turbo-1106:raphael::BDgtp2wd"
+# Wissen aus Datei einlesen
+def load_context():
+    context = []
+    try:
+        with open("/etc/secrets/wissen.jsonl", "r", encoding="utf-8") as f:
+            for line in f:
+                context.append(json.loads(line.strip()))
+    except Exception as e:
+        print("⚠️ Kontext konnte nicht geladen werden:", e)
+    return context
 
 @app.route('/')
 def home():
@@ -60,13 +71,13 @@ def ask():
         return jsonify({"error": "Keine Frage gestellt"}), 400
 
     question = data.get("question")
+    messages = load_context()
+    messages.append({"role": "user", "content": question})
 
     try:
         openai_response = openai.ChatCompletion.create(
-            model=FINE_TUNED_MODEL,
-            messages=[
-                {"role": "user", "content": question}
-            ]
+            model=MODEL,
+            messages=messages
         )
         answer = openai_response.choices[0].message.content
         print("✅ Antwort vom Modell:", answer)
