@@ -1,6 +1,16 @@
 let questionCount = 0;
 const maxQuestions = 10;
 
+document.addEventListener("DOMContentLoaded", () => {
+    checkLogin();
+
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML += `
+        <div class="bot-message">
+            👋 Hey! Willkommen beim Raphael-Chatbot! Ich bin Raphaels bester Freund und beantworte dir gerne bis zu ${maxQuestions} Fragen über ihn. Leg los!
+        </div>
+    `;
+});
 
 function checkLogin() {
     let remembered = localStorage.getItem("rememberMe");
@@ -21,6 +31,7 @@ function checkLogin() {
         });
     }
 }
+
 function checkPassword() {
     let password = document.getElementById("password").value;
     let rememberMe = document.getElementById("remember-me").checked;
@@ -51,19 +62,17 @@ function checkPassword() {
 }
 
 function sendMessage() {
+    if (questionCount >= maxQuestions) {
+        alert("Du hast bereits das Limit von 10 Fragen erreicht.");
+        return;
+    }
+
     let userInput = document.getElementById("user-input").value;
     if (!userInput.trim()) return;
 
     let chatBox = document.getElementById("chat-box");
-
-
-    chatBox.innerHTML += `
-        <div class="user-message">${userInput}</div>
-    `;
-
-
+    chatBox.innerHTML += `<div class="user-message">${userInput}</div>`;
     chatBox.scrollTop = chatBox.scrollHeight;
-
 
     fetch("https://chatbot-api-xw3r.onrender.com/ask", {
         method: "POST",
@@ -74,22 +83,26 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         if (data.answer) {
-            chatBox.innerHTML += `
-                <div class="bot-message">${data.answer}</div>
-            `;
+            chatBox.innerHTML += `<div class="bot-message">${data.answer}</div>`;
         } else {
-            chatBox.innerHTML += `
-                <div class="bot-message">❌ Fehler: ${data.error}</div>
-            `;
+            chatBox.innerHTML += `<div class="bot-message">❌ Fehler: ${data.error}</div>`;
         }
-
         
         chatBox.scrollTop = chatBox.scrollHeight;
+
+        questionCount += 1;
+        if (questionCount >= maxQuestions) {
+            chatBox.innerHTML += `
+                <div class="bot-message">
+                    🛑 Du hast das Limit von ${maxQuestions} Fragen erreicht. Sprich Raphael gerne direkt an, falls du noch weitere Fragen hast!
+                </div>
+            `;
+            document.getElementById("user-input").disabled = true;
+            document.getElementById("send-button").disabled = true;
+        }
     })
     .catch(error => {
-        chatBox.innerHTML += `
-            <div class="bot-message">❌ Fehler: Anfrage fehlgeschlagen.</div>
-        `;
+        chatBox.innerHTML += `<div class="bot-message">❌ Fehler: Anfrage fehlgeschlagen.</div>`;
         console.error("Fehler:", error);
     });
 
@@ -106,10 +119,9 @@ function logout() {
         alert("Du bist jetzt ausgeloggt.");
         document.getElementById("login-screen").style.display = "block";
         document.getElementById("main-content").style.display = "none";
-        localStorage.removeItem("rememberMe"); // Entfernt den gespeicherten Login-Status
+        localStorage.removeItem("rememberMe");
     });
 }
-
 
 function handleKeyPress(event) {
     if (event.key === "Enter") {
