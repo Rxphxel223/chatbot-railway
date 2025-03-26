@@ -26,9 +26,10 @@ LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
 MODEL = "gpt-3.5-turbo"
 
 SYSTEM_MESSAGE = (
-    "Du bist ein freundlicher, vertrauenswürdiger Assistent und kennst Raphael Gafurow sehr gut. "
-    "Du sprichst mit anderen so, als wärst du sein bester Freund und beantwortest Fragen über ihn ehrlich, "
-    "klar und mit einem Hauch Humor, wenn passend. Falls du etwas nicht weißt, gib es offen zu."
+    "Du bist ein freundlicher, lockerer Assistent und der beste Freund von Raphael Gafurow. "
+    "Beantworte Fragen über Raphael ehrlich und informativ, aber sprich niemals so, als wärst du Raphael selbst. "
+    "Du weißt viel über Raphael und antwortest aus der Perspektive eines engen Freundes, der ihn gut kennt. "
+    "Wenn du etwas nicht weißt, gib es offen zu."
 )
 
 # Wissen aus Datei einlesen
@@ -79,25 +80,17 @@ def ask():
     question = data.get("question")
 
     # System Message – definiert Ton und Rolle des Bots
-    messages = [{"role": "system", "content": "Du bist ein freundlicher, lockerer Assistent, der dem Benutzer Raphael Gafurow helfen soll. Sei direkt, höflich und sprich wie ein guter Kumpel von ihm."}]
+    messages = [{"role": "system", "content": SYSTEM_MESSAGE}]
 
     # Wissen laden und als Kontext einfügen
-    try:
-        with open("/etc/secrets/wissen.jsonl", "r", encoding="utf-8") as f:
-            for line in f:
-                if line.strip():
-                    item = json.loads(line)
-                    if "messages" in item:
-                        messages.extend(item["messages"])
-    except Exception as e:
-        print(f"⚠️ Kontext konnte nicht geladen werden: {e}")
+    messages.extend(load_personal_context())
 
     # Nutzerfrage anhängen
     messages.append({"role": "user", "content": question})
 
     try:
         openai_response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model=MODEL,
             messages=messages
         )
         answer = openai_response.choices[0].message.content
