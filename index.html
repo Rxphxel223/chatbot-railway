@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body onload="checkLogin()">
-    <!-- Login-Fenster -->
+
     <div id="login-screen">
         <h2>Passwortgeschützt</h2>
         <input type="password" id="password" placeholder="Passwort eingeben">
@@ -18,7 +18,6 @@
         <button onclick="checkPassword()">Login</button>
     </div>
 
-    <!-- Chat-Fenster (wird erst nach Login angezeigt) -->
     <div id="main-content" style="display:none;">
         <h2>Chatbot</h2>
         <button onclick="logout()">Logout</button>
@@ -26,7 +25,7 @@
             <div id="chat-box"></div>
             <div class="input-area">
                 <input type="text" id="user-input" placeholder="Stelle eine Frage über Raphael..." onkeydown="handleKeyPress(event)">
-                <button onclick="sendMessage()">Senden</button>
+                <button id="send-button" onclick="sendMessage()">Senden</button>
             </div>
         </div>
     </div>
