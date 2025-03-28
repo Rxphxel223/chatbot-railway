@@ -1,7 +1,7 @@
 import openai
 import os
 import json
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, send_file
 from flask_cors import CORS
 from flask_session import Session
 from datetime import datetime
@@ -9,7 +9,6 @@ import tempfile
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default-secret")
-
 
 SESSION_DIR = tempfile.mkdtemp()
 app.config["SESSION_FILE_DIR"] = SESSION_DIR
@@ -23,9 +22,8 @@ Session(app)
 CORS(app, supports_credentials=True)
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
-LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD", "fallback-passwort")
 MODEL = "gpt-3.5-turbo"
-FRAGEN_LOG_DATEI = "/etc/secrets/fragen_log.txt"
+FRAGEN_LOG_DATEI = os.path.join(tempfile.gettempdir(), "fragen_log.txt")
 
 SYSTEM_MESSAGE = (
     "Du bist ein freundlicher, lockerer Assistent und der beste Freund von Raphael Gafurow. "
@@ -34,16 +32,21 @@ SYSTEM_MESSAGE = (
     "Wenn du etwas nicht weißt, gib es offen zu."
 )
 
-# Wissen aus Datei einlesen
 WISSENSDATEI_PATH = "/etc/secrets/wissen.jsonl"
 def load_personal_context():
     try:
         with open(WISSENSDATEI_PATH, "r", encoding="utf-8") as f:
             messages = [json.loads(line)["messages"] for line in f if line.strip()]
-            return [msg for sublist in messages for msg in sublist]  # Flacht zu einer Liste ab
+            return [msg for sublist in messages for msg in sublist]
     except Exception as e:
         print(f"⚠️ Kontext konnte nicht geladen werden: {e}")
         return [{"role": "system", "content": "Ich bin ein persönlicher Assistent von Raphael Gafurow."}]
+
+LOGIN_PASSWORDS = {
+    os.getenv("LOGIN_PASSWORD_1"): "Benutzer 1",
+    os.getenv("LOGIN_PASSWORD_2"): "Benutzer 2",
+    os.getenv("LOGIN_PASSWORD_3"): "Benutzer 3"
+}
 
 @app.route('/')
 def home():
@@ -52,10 +55,14 @@ def home():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
-    if data.get("password") == LOGIN_PASSWORD:
+    password = data.get("password")
+
+    if password in LOGIN_PASSWORDS:
         session["logged_in"] = True
+        session["user_identifier"] = LOGIN_PASSWORDS[password]
         session.modified = True
         return jsonify({"message": "Erfolgreich eingeloggt"}), 200
+
     return jsonify({"error": "Falsches Passwort"}), 403
 
 @app.route('/logout', methods=['POST'])
@@ -81,19 +88,15 @@ def ask():
 
     question = data.get("question")
 
+    user_identifier = session.get("user_identifier", "Unbekannt")
     try:
         with open(FRAGEN_LOG_DATEI, "a", encoding="utf-8") as log_file:
-            log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {question}\n")
+            log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {user_identifier}: {question}\n")
     except Exception as e:
         print(f"⚠️ Fehler beim Loggen der Frage: {e}")
 
-    # System Message – definiert Ton und Rolle des Bots
     messages = [{"role": "system", "content": SYSTEM_MESSAGE}]
-
-    # Wissen laden und als Kontext einfügen
     messages.extend(load_personal_context())
-
-    # Nutzerfrage anhängen
     messages.append({"role": "user", "content": question})
 
     try:
@@ -108,6 +111,16 @@ def ask():
     except Exception as e:
         print("❌ Fehler bei Anfrage an OpenAI:", str(e))
         return jsonify({"error": str(e)}), 500
+
+@app.route(f'/show-logs-{os.getenv("LOG_SECRET_CODE")}', methods=['GET'])
+def show_logs():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Nicht eingeloggt"}), 403
+
+    if os.path.exists(FRAGEN_LOG_DATEI):
+        return send_file(FRAGEN_LOG_DATEI, mimetype='text/plain')
+    else:
+        return jsonify({"error": "Keine Logs vorhanden"}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
