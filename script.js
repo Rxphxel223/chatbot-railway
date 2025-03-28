@@ -71,47 +71,57 @@ function checkPassword() {
 }
 
 function sendMessage() {
-    if (questionCount >= maxQuestions) {
-        return;
-    }
-
     let userInput = document.getElementById("user-input").value;
     if (!userInput.trim()) return;
 
     let chatBox = document.getElementById("chat-box");
-    chatBox.innerHTML += `<div class="user-message">${userInput}</div>`;
+
+    chatBox.innerHTML += `
+        <div class="user-message">${userInput}</div>
+    `;
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Typing Indicator anzeigen
+    let typingIndicator = document.createElement("div");
+    typingIndicator.className = "bot-message typing-indicator";
+    typingIndicator.innerHTML = `
+        <span></span><span></span><span></span>
+    `;
+    chatBox.appendChild(typingIndicator);
     chatBox.scrollTop = chatBox.scrollHeight;
 
     fetch("https://chatbot-api-xw3r.onrender.com/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", 
+        credentials: "include",
         body: JSON.stringify({ question: userInput })
     })
     .then(response => response.json())
     .then(data => {
+        // Entferne Typing Indicator
+        typingIndicator.remove();
+
         if (data.answer) {
-            chatBox.innerHTML += `<div class="bot-message">${data.answer}</div>`;
+            chatBox.innerHTML += `
+                <div class="bot-message">${data.answer}</div>
+            `;
         } else {
-            chatBox.innerHTML += `<div class="bot-message">❌ Fehler: ${data.error}</div>`;
+            chatBox.innerHTML += `
+                <div class="bot-message">❌ Fehler: ${data.error}</div>
+            `;
         }
 
         chatBox.scrollTop = chatBox.scrollHeight;
-
-        questionCount += 1;
-        if (questionCount >= maxQuestions) {
-            chatBox.innerHTML += `
-                <div class="bot-message">
-                    🛑 Du hast das Limit von ${maxQuestions} Fragen erreicht. Sprich Raphael gerne direkt an, wenn du noch mehr wissen willst!
-                </div>
-            `;
-            document.getElementById("user-input").disabled = true;
-            document.getElementById("send-button").disabled = true;
-        }
     })
     .catch(error => {
-        chatBox.innerHTML += `<div class="bot-message">❌ Fehler: Anfrage fehlgeschlagen.</div>`;
+        typingIndicator.remove();
+
+        chatBox.innerHTML += `
+            <div class="bot-message">❌ Fehler: Anfrage fehlgeschlagen.</div>
+        `;
         console.error("Fehler:", error);
+        chatBox.scrollTop = chatBox.scrollHeight;
     });
 
     document.getElementById("user-input").value = "";
