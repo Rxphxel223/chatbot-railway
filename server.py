@@ -88,6 +88,14 @@ def ask():
         print("❌ Nicht eingeloggt")
         return jsonify({"error": "Nicht eingeloggt"}), 403
 
+    if "question_count" not in session:
+        session["question_count"] = 0
+
+    is_admin = session.get("is_admin", False)
+
+    if not is_admin and session["question_count"] >= 10:
+        return jsonify({"error": "Du hast die maximale Anzahl an Fragen erreicht."}), 429
+
     data = request.json
     print("📩 Eingehende Anfrage:", data)
 
@@ -115,6 +123,11 @@ def ask():
         )
         answer = openai_response.choices[0].message.content
         print("✅ Antwort vom Modell:", answer)
+
+        if not is_admin:
+            session["question_count"] += 1
+            session.modified = True
+        
         return jsonify({"answer": answer})
 
     except Exception as e:
