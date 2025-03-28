@@ -117,13 +117,6 @@ def ask():
 
     question = data.get("question")
 
-    user_identifier = session.get("user_identifier", "Unbekannt")
-    try:
-        with open(FRAGEN_LOG_DATEI, "a", encoding="utf-8") as log_file:
-            log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {user_identifier}: {question}\n")
-    except Exception as e:
-        print(f"⚠️ Fehler beim Loggen der Frage: {e}")
-
     messages = [{"role": "system", "content": SYSTEM_MESSAGE}]
     messages.extend(load_personal_context())
     messages.append({"role": "user", "content": question})
@@ -136,10 +129,22 @@ def ask():
         answer = openai_response.choices[0].message.content
         print("✅ Antwort vom Modell:", answer)
 
+        user_identifier = session.get("user_identifier", "Unbekannt")
+
+        # ⚙️ Fragen und Antworten loggen
+        try:
+            with open(FRAGEN_LOG_DATEI, "a", encoding="utf-8") as log_file:
+                log_file.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {user_identifier}:\n")
+                log_file.write(f"❓ Frage: {question}\n")
+                log_file.write(f"💬 Antwort: {answer}\n")
+                log_file.write("-" * 40 + "\n")
+        except Exception as log_e:
+            print(f"⚠️ Fehler beim Loggen der Frage und Antwort: {log_e}")
+
         if not is_admin:
             session["question_count"] += 1
             session.modified = True
-        
+
         return jsonify({"answer": answer})
 
     except Exception as e:
