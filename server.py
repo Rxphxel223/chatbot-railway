@@ -47,6 +47,7 @@ LOGIN_PASSWORDS = {
     os.getenv("LOGIN_PASSWORD_2"): "Benutzer 2",
     os.getenv("LOGIN_PASSWORD_3"): "Benutzer 3"
 }
+LOGIN_PASSWORD_ADMIN = os.getenv("LOGIN_PASSWORD_ADMIN")
 
 @app.route('/')
 def home():
@@ -57,9 +58,17 @@ def login():
     data = request.json
     password = data.get("password")
 
-    if password in LOGIN_PASSWORDS:
+    if password == LOGIN_PASSWORD_ADMIN:
+        session["logged_in"] = True
+        session["user_identifier"] = "Admin"
+        session["is_admin"] = True  
+        session.modified = True
+        return jsonify({"message": "Erfolgreich als Admin eingeloggt"}), 200
+
+    elif password in LOGIN_PASSWORDS:
         session["logged_in"] = True
         session["user_identifier"] = LOGIN_PASSWORDS[password]
+        session["is_admin"] = False
         session.modified = True
         return jsonify({"message": "Erfolgreich eingeloggt"}), 200
 
