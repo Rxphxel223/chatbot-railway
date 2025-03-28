@@ -1,11 +1,13 @@
-import openai
-import os
-import json
+
 from flask import Flask, request, jsonify, session, send_file
 from flask_cors import CORS
 from flask_session import Session
 from datetime import datetime
 import tempfile
+import openai
+import os
+import json
+import time
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "default-secret")
@@ -58,10 +60,16 @@ def login():
     data = request.json
     password = data.get("password")
 
+    attempts = session.get('login_attempts', 0)
+
+    if attempts >= 3:
+        time.sleep(5)
+
     if password == LOGIN_PASSWORD_ADMIN:
         session["logged_in"] = True
         session["user_identifier"] = "Admin"
-        session["is_admin"] = True  
+        session["is_admin"] = True
+        session["login_attempts"] = 0
         session.modified = True
         return jsonify({"message": "Erfolgreich als Admin eingeloggt"}), 200
 
@@ -69,10 +77,14 @@ def login():
         session["logged_in"] = True
         session["user_identifier"] = LOGIN_PASSWORDS[password]
         session["is_admin"] = False
+        session["login_attempts"] = 0
         session.modified = True
         return jsonify({"message": "Erfolgreich eingeloggt"}), 200
 
-    return jsonify({"error": "Falsches Passwort"}), 403
+    else:
+        session["login_attempts"] = attempts + 1
+        session.modified = True
+        return jsonify({"error": "Falsches Passwort"}), 403
 
 @app.route('/logout', methods=['POST'])
 def logout():
