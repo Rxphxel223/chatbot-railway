@@ -1,56 +1,36 @@
-/* Basislayout */
+/* AURORA BACKGROUND */
+#aurora {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 40%, rgba(98, 0, 255, 0.2), transparent 70%),
+              radial-gradient(circle at 80% 60%, rgba(0, 255, 200, 0.2), transparent 70%),
+              radial-gradient(circle at 50% 90%, rgba(255, 0, 120, 0.2), transparent 70%);
+  background-repeat: no-repeat;
+  background-size: 200% 200%;
+  animation: moveAurora 25s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes moveAurora {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* --- REST DEINER STYLES --- */
 body {
   margin: 0;
   height: 100vh;
   overflow: hidden;
-  font-family: 'Arial', sans-serif;
-  color: #ffffff;
+  font-family: Arial, sans-serif;
+  color: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #0f0f1a;
 }
 
-/* Aurora-Hintergrund */
-#aurora-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: -1;
-  background: radial-gradient(circle at center, #0f0f1a, #050510);
-}
-
-.aurora {
-  position: absolute;
-  width: 150%;
-  height: 150%;
-  background: radial-gradient(circle, rgba(153, 102, 255, 0.3), transparent 70%);
-  filter: blur(120px);
-  animation: float 20s infinite alternate ease-in-out;
-  transform: translate(-20%, -20%);
-}
-
-.aurora2 {
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.2), transparent 70%);
-  animation-delay: 5s;
-}
-
-@keyframes float {
-  0% {
-    transform: translate(-10%, -10%) rotate(0deg);
-  }
-  50% {
-    transform: translate(10%, 10%) rotate(180deg);
-  }
-  100% {
-    transform: translate(-10%, -10%) rotate(360deg);
-  }
-}
-
-/* Login & Chatfenster */
 #login-screen,
 #main-content {
   position: relative;
@@ -63,7 +43,6 @@ body {
   z-index: 1;
 }
 
-/* Eingabe & Buttons */
 input[type="password"],
 input[type="text"] {
   width: 100%;
@@ -90,7 +69,6 @@ button:hover {
   background-color: #4752C4;
 }
 
-/* Chatbereich */
 .chat-container {
   display: flex;
   flex-direction: column;
