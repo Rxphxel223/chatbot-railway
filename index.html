@@ -4,10 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot Login</title>
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+
+        #background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(270deg, #1f1c2c, #928DAB, #1f1c2c);
+            background-size: 600% 600%;
+            animation: aurora 20s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes aurora {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #login-screen, #main-content {
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            margin: 5% auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #5865F2;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4752C4;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        #chat-box {
+            height: 300px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .input-area input {
+            flex: 1;
+        }
+    </style>
 </head>
 <body onload="checkLogin()">
+    <div id="background"></div>
 
     <div id="login-screen">
         <h2>Passwortgeschützt</h2>
@@ -29,6 +114,5 @@
             </div>
         </div>
     </div>
-
 </body>
 </html>
