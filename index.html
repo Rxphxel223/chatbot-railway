@@ -2,31 +2,36 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Raphael Chatbot</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="script.js" defer></script>
 </head>
 <body onload="checkLogin()">
-  <div class="aurora-background"></div>
+  <div id="aurora-background">
+    <div class="aurora"></div>
+    <div class="aurora aurora2"></div>
+  </div>
 
   <div id="login-screen">
-    <h2>🔒 Passwortgeschützt</h2>
-    <input type="password" id="password" placeholder="Passwort eingeben" onkeydown="handleKeyPress(event)">
-    <label><input type="checkbox" id="remember-me"> Eingeloggt bleiben</label>
+    <h2>Passwortgeschützt</h2>
+    <input type="password" id="password" placeholder="Passwort eingeben" />
+    <label><input type="checkbox" id="remember-me" /> Eingeloggt bleiben</label>
     <button onclick="checkPassword()">Login</button>
   </div>
 
-  <div id="main-content" style="display:none;">
-    <div class="chat-wrapper">
-      <div class="bot-message welcome-msg">
-        👋 <strong>Willkommen!</strong> Ich bin hier, um dir dabei zu helfen, Raphael besser kennenzulernen. Stelle bis zu 10 Fragen und ich werde als sein bester Freund antworten. Leg los!
+  <div id="main-content" style="display: none;">
+    <div class="chat-container">
+      <div id="chat-box">
+        <div class="bot-message">
+          👋 <strong>Willkommen!</strong> Ich bin hier, damit du Raphael besser kennenlernen kannst. Ich beantworte deine Fragen über Raphael aus der Sicht seines besten Freundes. Für die besten Ergebnisse formuliere deine Fragen bitte so, dass der Name „Raphael“ darin vorkommt. Du kannst mir bis zu 10 Fragen stellen – leg gerne los!
+        </div>
       </div>
-      <div id="chat-box"></div>
       <div class="input-area">
-        <input type="text" id="user-input" placeholder="Schreiben Sie eine Nachricht..." onkeydown="handleKeyPress(event)">
-        <button onclick="sendMessage()">Senden</button>
+        <input type="text" id="user-input" placeholder="Stelle eine Frage über Raphael..." onkeydown="handleKeyPress(event)" />
+        <button id="send-button" onclick="sendMessage()">Senden</button>
       </div>
+      <button onclick="logout()">Logout</button>
     </div>
   </div>
 </body>
