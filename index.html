@@ -1,82 +1,34 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatbot Login</title>
-  <script src="script.js" defer></script>
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      color: #ffffff;
-    }
-
-    #aurora-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(270deg, #1f1c2c, #928DAB, #1f1c2c);
-      background-size: 600% 600%;
-      animation: auroraFlow 20s ease infinite;
-      z-index: -1;
-      filter: url(#aurora);
-    }
-
-    @keyframes auroraFlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    svg {
-      position: absolute;
-      width: 0;
-      height: 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Login</title>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body onload="checkLogin()">
-  <!-- 🎨 Aurora-Effekt SVG -->
-  <svg>
-    <filter id="aurora">
-      <feTurbulence type="turbulence" baseFrequency="0.01" numOctaves="3" result="turb" />
-      <feDisplacementMap in="SourceGraphic" in2="turb" scale="60" xChannelSelector="R" yChannelSelector="G" />
-      <animate xlink:href="#aurora" attributeName="scale" values="40; 60; 40" dur="15s" repeatCount="indefinite" />
-    </filter>
-  </svg>
 
-  <!-- 🌌 Aurora-Hintergrund -->
-  <div id="aurora-background"></div>
-
-  <!-- 🔐 Login -->
-  <div id="login-screen">
-    <h2>Passwortgeschützt</h2>
-    <input type="password" id="password" placeholder="Passwort eingeben">
-    <label>
-      <input type="checkbox" id="remember-me"> Eingeloggt bleiben
-    </label>
-    <button onclick="checkPassword()">Login</button>
-  </div>
-
-  <!-- 🤖 Haupt-Chat-Inhalt -->
-  <div id="main-content" style="display:none;">
-    <h2>Chatbot</h2>
-    <button onclick="logout()">Logout</button>
-    <div class="chat-container">
-      <div id="chat-box"></div>
-      <div class="input-area">
-        <input type="text" id="user-input" placeholder="Stelle eine Frage über Raphael..." onkeydown="handleKeyPress(event)">
-        <button id="send-button" onclick="sendMessage()">Senden</button>
-      </div>
+    <div id="login-screen">
+        <h2>Passwortgeschützt</h2>
+        <input type="password" id="password" placeholder="Passwort eingeben">
+        <label>
+            <input type="checkbox" id="remember-me"> Eingeloggt bleiben
+        </label>
+        <button onclick="checkPassword()">Login</button>
     </div>
-  </div>
+
+    <div id="main-content" style="display:none;">
+        <h2>Chatbot</h2>
+        <button onclick="logout()">Logout</button>
+        <div class="chat-container">
+            <div id="chat-box"></div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Stelle eine Frage über Raphael..." onkeydown="handleKeyPress(event)">
+                <button id="send-button" onclick="sendMessage()">Senden</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
