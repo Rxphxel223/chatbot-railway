@@ -1,4 +1,3 @@
-
 body {
     font-family: Arial, sans-serif;
     background-color: #1e1e1e;
@@ -8,10 +7,13 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 .chat-container {
-    width: 500px;
+    width: 100%;
+    max-width: 500px;
     background: #2e2e2e;
     border-radius: 10px;
     padding: 15px;
@@ -19,22 +21,24 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    box-sizing: border-box;
 }
 
 #chat-box {
-    height: 500px;
+    height: 60vh;
     overflow-y: auto;
     padding: 10px;
     border-bottom: 1px solid #444;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    box-sizing: border-box;
 }
-
 
 .input-area {
     display: flex;
-    margin-top: 10px;
+    gap: 5px;
+    flex-direction: row;
 }
 
 input {
@@ -42,7 +46,6 @@ input {
     padding: 10px;
     border: none;
     border-radius: 5px;
-    margin-right: 5px;
     font-size: 14px;
     background-color: #444;
     color: white;
@@ -118,4 +121,29 @@ button:hover {
 @keyframes pulse {
     from { opacity: 0.2; }
     to { opacity: 1; }
+}
+
+
+@media screen and (max-width: 600px) {
+    .chat-container {
+        padding: 10px;
+    }
+
+    #chat-box {
+        height: 50vh;
+    }
+
+    .input-area {
+        flex-direction: column;
+    }
+
+    input, button {
+        width: 100%;
+        margin: 0;
+    }
+
+    button {
+        margin-top: 5px;
+        padding: 12px;
+    }
 }
