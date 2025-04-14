@@ -21,7 +21,10 @@ app.config["SESSION_COOKIE_SAMESITE"] = "None"
 app.config["SESSION_COOKIE_SECURE"] = True
 Session(app)
 
-CORS(app, supports_credentials=True, origins=["https://raphaelgafurow.de"])
+
+CORS(app, supports_credentials=True, resources={
+    r"/*": {"origins": "https://raphaelgafurow.de"}
+})
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 MODEL = "gpt-3.5-turbo"
@@ -151,6 +154,19 @@ def ask():
     except Exception as e:
         print("❌ Fehler bei Anfrage an OpenAI:", str(e))
         return jsonify({"error": str(e)}), 500
+
+@app.route("/set-cookie-test")
+def set_cookie():
+    session["test"] = "cookie funktioniert"
+    return jsonify({"message": "Cookie gesetzt"})
+
+
+@app.route("/get-cookie-test")
+def get_cookie():
+    value = session.get("test", "NICHT GESETZT")
+    return jsonify({"cookie_inhalt": value})
+
+
 
 @app.route(f'/show-logs-{os.getenv("LOG_SECRET_CODE")}', methods=['GET'])
 def show_logs():
