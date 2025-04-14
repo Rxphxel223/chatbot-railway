@@ -93,6 +93,7 @@ def logout():
 
 @app.route('/ask', methods=['POST'])
 def ask():
+    print("Cookies:", request.cookies)
     print("🔍 /ask wurde aufgerufen")
     print("📂 Session Inhalt:", session)
 
