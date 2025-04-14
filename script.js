@@ -1,5 +1,6 @@
 let questionCount = 0;
 const maxQuestions = 10;
+let token = localStorage.getItem("accessToken");
 
 document.addEventListener("DOMContentLoaded", () => {
     checkLogin();
@@ -14,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     `;
 
-    // Enter-Taste aktiviert Login im Passwortfeld
     document.getElementById("password").addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
             checkPassword();
@@ -23,104 +23,76 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function checkLogin() {
-    let remembered = localStorage.getItem("rememberMe");
-    if (remembered === "true") {
+    if (token) {
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("main-content").style.display = "block";
-    } else {
-        fetch("https://chatbot-api-xw3r.onrender.com/login", {
-            method: "POST",
-            credentials: "include"
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                document.getElementById("login-screen").style.display = "none";
-                document.getElementById("main-content").style.display = "block";
-            }
-        });
     }
 }
 
 function checkPassword() {
-    let password = document.getElementById("password").value;
-    let rememberMe = document.getElementById("remember-me").checked;
+    const password = document.getElementById("password").value;
+    const rememberMe = document.getElementById("remember-me").checked;
 
     fetch("https://chatbot-api-xw3r.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",  
-        body: JSON.stringify({ password: password })
+        body: JSON.stringify({ password })
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
-        if (data.message) {
+        if (data.token) {
+            token = data.token;
+            if (rememberMe) {
+                localStorage.setItem("accessToken", token);
+            }
             document.getElementById("login-screen").style.display = "none";
             document.getElementById("main-content").style.display = "block";
-
-            if (rememberMe) {
-                localStorage.setItem("rememberMe", "true");
-            }
         } else {
             alert("Falsches Passwort!");
         }
     })
-    .catch(error => {
-        console.error("Login-Fehler:", error);
+    .catch(err => {
+        console.error("Login-Fehler:", err);
     });
 }
 
 function sendMessage() {
-    let userInput = document.getElementById("user-input").value;
+    const userInput = document.getElementById("user-input").value;
     if (!userInput.trim()) return;
 
-    let chatBox = document.getElementById("chat-box");
-
-    chatBox.innerHTML += `
-        <div class="user-message">${userInput}</div>
-    `;
-
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML += `<div class="user-message">${userInput}</div>`;
     chatBox.scrollTop = chatBox.scrollHeight;
 
     // Typing Indicator anzeigen
-    let typingIndicator = document.createElement("div");
+    const typingIndicator = document.createElement("div");
     typingIndicator.className = "bot-message typing-indicator";
-    typingIndicator.innerHTML = `
-        <span></span><span></span><span></span>
-    `;
+    typingIndicator.innerHTML = `<span></span><span></span><span></span>`;
     chatBox.appendChild(typingIndicator);
     chatBox.scrollTop = chatBox.scrollHeight;
 
     fetch("https://chatbot-api-xw3r.onrender.com/ask", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ question: userInput })
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
-        // Entferne Typing Indicator
         typingIndicator.remove();
-
         if (data.answer) {
-            chatBox.innerHTML += `
-                <div class="bot-message">${data.answer}</div>
-            `;
+            chatBox.innerHTML += `<div class="bot-message">${data.answer}</div>`;
         } else {
-            chatBox.innerHTML += `
-                <div class="bot-message">❌ Fehler: ${data.error}</div>
-            `;
+            chatBox.innerHTML += `<div class="bot-message">❌ Fehler: ${data.error}</div>`;
         }
-
         chatBox.scrollTop = chatBox.scrollHeight;
     })
-    .catch(error => {
+    .catch(err => {
         typingIndicator.remove();
-
-        chatBox.innerHTML += `
-            <div class="bot-message">❌ Fehler: Anfrage fehlgeschlagen.</div>
-        `;
-        console.error("Fehler:", error);
+        chatBox.innerHTML += `<div class="bot-message">❌ Fehler: Anfrage fehlgeschlagen.</div>`;
+        console.error("Fehler:", err);
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 
@@ -128,16 +100,10 @@ function sendMessage() {
 }
 
 function logout() {
-    fetch("https://chatbot-api-xw3r.onrender.com/logout", {
-        method: "POST",
-        credentials: "include"
-    })
-    .then(response => response.json())
-    .then(() => {
-        document.getElementById("login-screen").style.display = "block";
-        document.getElementById("main-content").style.display = "none";
-        localStorage.removeItem("rememberMe");
-    });
+    localStorage.removeItem("accessToken");
+    token = null;
+    document.getElementById("login-screen").style.display = "block";
+    document.getElementById("main-content").style.display = "none";
 }
 
 function handleKeyPress(event) {
