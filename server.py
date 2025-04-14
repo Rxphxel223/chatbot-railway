@@ -21,7 +21,7 @@ app.config["SESSION_COOKIE_SAMESITE"] = "None"
 app.config["SESSION_COOKIE_SECURE"] = True
 Session(app)
 
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["https://raphaelgafurow.de"])
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 MODEL = "gpt-3.5-turbo"
