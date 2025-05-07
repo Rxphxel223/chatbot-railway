@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaphaelGPT</title>
+    <link rel="stylesheet" href="general.css">
+    <script src="general.js" defer></script>
+</head>
+<body>
+    <div class="chat-wrapper">
+        <header>
+            <h1>💬 RaphaelGPT</h1>
+        </header>
+        <div id="general-chat-box" class="chat-box"></div>
+        <div class="input-area">
+            <input type="text" id="general-user-input" placeholder="Frag mich alles..." onkeydown="handleGeneralKeyPress(event)">
+            <button onclick="sendGeneralMessage()">Senden</button>
+        </div>
+    </div>
+</body>
+</html>
