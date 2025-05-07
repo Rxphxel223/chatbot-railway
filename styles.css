@@ -126,6 +126,29 @@ button:hover {
     animation-delay: 0.4s;
 }
 
+#alternative-access {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 10;
+}
+
+#alternative-access button {
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#alternative-access button:hover {
+    background-color: #666;
+}
+
 @keyframes pulse {
     from { opacity: 0.2; }
     to { opacity: 1; }
