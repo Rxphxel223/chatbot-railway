@@ -130,7 +130,7 @@ def ask():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/festival_kochbuch")Add commentMore actions
+@app.route("/festival_kochbuch")
 def festival_kochbuch():
     return send_file("festival_kochbuch.html")
 
