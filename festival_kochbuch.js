@@ -34,11 +34,31 @@ function removeItem(index) {
 
 async function generateRecipe() {
   recipeOutput.textContent = "⏳ Rezept wird geladen...";
-  const response = await fetch("/api/festival-rezept", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ items })
-  });
+  try {
+    const response = await fetch("/api/festival-rezept", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items })
+    });
+
+    const text = await response.text(); // <-- kein .json(), wir lesen erstmal Text
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (jsonErr) {
+      recipeOutput.textContent = "❌ Serverfehler: Keine gültige JSON-Antwort erhalten.\n\n" + text;
+      console.error("❌ Ungültige JSON-Antwort:", text);
+      return;
+    }
+
+    recipeOutput.textContent = data.recipe || "❌ Kein Rezept erhalten.";
+
+  } catch (err) {
+    recipeOutput.textContent = "❌ Fehler beim Abrufen des Rezepts.";
+    console.error(err);
+  }
+}
 
   const data = await response.json();
   recipeOutput.textContent = data.recipe || "❌ Kein Rezept erhalten.";
