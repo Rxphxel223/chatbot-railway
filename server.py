@@ -135,7 +135,7 @@ def festival_rezept():
     import os, requests
     from flask import request, jsonify
 
-    api_url = "https://<DEINE-RENDER-URL>/v1/chat/completions"
+    api_url = "https://chatbot-api-xw3r.onrender.com/v1/chat/completions"
     api_key = os.environ.get("KOCH_API_KEY")
     items = request.json.get("items", [])
 
