@@ -130,6 +130,30 @@ def ask():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/api/festival-rezept", methods=["POST"])
+def festival_rezept():
+    import os, requests
+    from flask import request, jsonify
+
+    api_url = "https://<DEINE-RENDER-URL>/v1/chat/completions"
+    api_key = os.environ.get("KOCH_API_KEY")
+    items = request.json.get("items", [])
+
+    prompt = f"""Du bist ein Festival-Koch. Nutze nur folgende Zutaten: {', '.join(items)}.
+Gib ein einfaches Gericht an, das mit einem Gaskocher zubereitet werden kann."""
+
+    res = requests.post(api_url, headers={
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }, json={
+        "model": "gpt-3.5-turbo",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.7
+    })
+
+    recipe = res.json().get("choices", [{}])[0].get("message", {}).get("content", "Fehler.")
+    return jsonify({"recipe": recipe})
+
 @app.route(f'/show-logs-{LOG_SECRET_CODE}', methods=['GET'])
 def show_logs():
     user = get_user_from_token()
