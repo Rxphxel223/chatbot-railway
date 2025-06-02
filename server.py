@@ -134,7 +134,7 @@ def ask():
 def festival_kochbuch():
     return send_file("festival_kochbuch.html")
 
-@app.route("/api/festival-rezept", methods=["POST"])
+@app.route("/api/festival_rezept", methods=["POST"])
 def festival_rezept():
     import os, requests
     from flask import request, jsonify
