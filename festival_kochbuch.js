@@ -35,13 +35,13 @@ function removeItem(index) {
 async function generateRecipe() {
   recipeOutput.textContent = "⏳ Rezept wird geladen...";
   try {
-    const response = await fetch("/api/festival-rezept", {
+    const response = await fetch("https://chatbot-api-xw3r.onrender.com/api/festival-rezept", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ items })
     });
 
-    const text = await response.text(); // <-- kein .json(), wir lesen erstmal Text
+    const text = await response.text();
 
     let data;
     try {
@@ -58,10 +58,6 @@ async function generateRecipe() {
     recipeOutput.textContent = "❌ Fehler beim Abrufen des Rezepts.";
     console.error(err);
   }
-}
-
-  const data = await response.json();
-  recipeOutput.textContent = data.recipe || "❌ Kein Rezept erhalten.";
 }
 
 updateUI();
