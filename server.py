@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, render_template
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from datetime import datetime
 import tempfile
@@ -132,7 +132,7 @@ def ask():
 
 @app.route("/festival-kochbuch")
 def festival_kochbuch():
-    return render_template("festival_kochbuch.html")
+    return send_file("festival_kochbuch.html")
 
 @app.route("/api/festival-rezept", methods=["POST"])
 def festival_rezept():
