@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Festival Kochbuch</title>
+  <script defer src="/festival_kochbuch.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+    input, button, pre { margin-top: 10px; padding: 10px; width: 100%; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin-bottom: 5px; background: #fff; padding: 5px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>🧑‍🍳 Festival Kochbuch</h1>
+
+  <label>🔍 Artikel hinzufügen:</label>
+  <input type="text" id="itemInput" placeholder="z.B. Halloumi">
+  <button onclick="addItem()">➕ Hinzufügen</button>
+
+  <h2>🛒 Meine Artikel</h2>
+  <ul id="itemList"></ul>
+
+  <button onclick="generateRecipe()">📜 Rezept generieren</button>
+
+  <h2>🍲 Vorschlag:</h2>
+  <pre id="recipeOutput">Noch kein Rezept.</pre>
+</body>
+</html>
