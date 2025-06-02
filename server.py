@@ -130,9 +130,23 @@ def ask():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/festival_kochbuch")
-def festival_kochbuch():
-    return send_file("festival_kochbuch.html")
+@app.route("/api/festival_rezept", methods=["POST"])
+def festival_rezept():
+    items = request.json.get("items", [])
+    prompt = f"""Du bist ein Festival-Koch. Nutze nur folgende Zutaten: {', '.join(items)}.
+Gib ein einfaches Gericht an, das mit einem Gaskocher zubereitet werden kann."""
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        recipe = response.choices[0].message.content
+        return jsonify({"recipe": recipe})
+
+    except Exception as e:
+        print(f"❌ Fehler bei Rezeptgenerierung: {e}")
+        return jsonify({"recipe": f"Fehler: {str(e)}"}), 500
 
 @app.route("/api/festival_rezept", methods=["POST"])
 def festival_rezept():
